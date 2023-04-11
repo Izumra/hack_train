@@ -6,7 +6,7 @@ WORKDIR /hack_train
 
 ENV NODE_ENV=production
 
-COPY ["package.json","package-lock.json","./"]
+COPY ["package.json","./"]
 
 RUN npm i --production
 
