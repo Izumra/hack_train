@@ -1,0 +1,46 @@
+.menu-icon {
+	width: 32px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background-color: transparent;
+	@media (max-width: $md2+px) {
+		display: flex;
+	}
+	span {
+		width: 100%;
+		height: 2px;
+		background-color: black;
+		&:not(:last-child) {
+			margin-bottom: 6px;
+		}
+	}
+}
+
+.breadcrumb{
+	font-weight: 500;
+	span, a{
+		color: $grayText;
+	}
+	a {
+		&::after{
+			content: ' /';
+		}	
+	}
+}
+
+.header {
+	padding: 19px 0;
+
+	&__container {
+		display: flex;
+		align-items: center;
+	}
+
+	&__menu-icon {
+		margin-right: 20px;
+	}
+
+	&__breadcrumb {
+	}
+}

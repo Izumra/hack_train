@@ -1,0 +1,17 @@
+<header class="header">
+	<div class="header__container container">
+		<button class="menu-icon header__menu-icon">
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+		<div class="breadcrumb header__breadcrumb">
+			<% for (const crumb of breadcrumb) { %>
+				<% if (crumb.link) { %>
+					<a href="<%= crumb.link%>"><%= crumb.name%></a>
+				<%} else {%>
+					<span><%= crumb.name%></span>
+			<% }} %>
+		</div>
+	</div>
+</header>

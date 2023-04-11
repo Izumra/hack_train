@@ -1,0 +1,39 @@
+{
+  "name": "learn_platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "gulp",
+    "nodemon": "start /MIN nodemon server.dev.js",
+    "start": "node server.dev.js",
+    "build":"node server.js"
+  },
+  "author": "Vladimir Kondaurov",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.27.10",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-if": "^3.0.0",
+    "gulp-sass": "^5.1.0",
+    "nodemon": "^2.0.21",
+    "sass": "^1.52.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.306.0",
+    "@aws-sdk/s3-request-presigner": "^3.309.0",
+    "connect-redis": "^7.0.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "ioredis": "^5.3.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.22",
+    "pg": "^8.10.0"
+  }
+}

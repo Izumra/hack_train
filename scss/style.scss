@@ -1,0 +1,267 @@
+@import "reset";
+@import "fonts";
+
+$minWidth: 320;
+$maxWidth: 1920;
+$maxWidthContainer: 1340;
+$md1: 1274.98;
+$md2: 991.98;
+$md3: 767.98;
+$md4: 479.98;
+
+$grayText: #9f9f9f;
+$blackText: #282828;
+
+body {
+	font-family: "Inter";
+	color: $blackText;
+	background-color: #f7f9fc;
+}
+
+//Адаптивное свойство
+@mixin adaptiv-value($property, $startSize, $minSize, $type: 1) {
+	$addSize: $startSize - $minSize;
+
+	@if $type==1 {
+		// Только если меньше контейнера
+		#{$property}: $startSize + px;
+
+		@media (max-width: #{$maxWidthContainer + px}) {
+			#{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidthContainer - 320}));
+		}
+	} @else if $type==2 {
+		// Только если больше контейнера
+		#{$property}: $startSize + px;
+
+		@media (min-width: #{$maxWidthContainer + px}) {
+			#{$property}: calc(#{$minSize + px} #{$addSize} * ((100vw - 320px) / #{$maxWidth - 320}));
+		}
+	} @else {
+		// Всегда
+		#{$property}: calc(#{$minSize + px} + #{$addSize} * ((100vw - 320px) / #{$maxWidth - 320}));
+	}
+}
+
+.container {
+	padding: 0 32px;
+	width: $maxWidthContainer + 64px;
+	margin: 0 auto;
+	// @media (max-width: $md1+px) {
+	// 	width: 980px;
+	// }
+	// @media (max-width: $md2+px) {
+	// 	width: 750px;
+	// }
+	// @media (max-width: $md3+px) {
+	// 	width: 100%;
+	// 	padding: 0 40px;
+	// }
+	// @media (max-width: $md3+px) {
+	// 	padding: 0 15px;
+	// }
+}
+
+.border-style {
+	border: 1px solid $grayText;
+	border-radius: 20px;
+}
+
+.input {
+	border: 1px solid black;
+	border-radius: 20px;
+	font-size: 17px;
+	font-weight: 600;
+	padding: 16px;
+	line-height: 1.2;
+}
+
+.dropdown {
+	user-select: none;
+	position: relative;
+
+	&__select {
+		position: relative;
+		@extend .input;
+		padding-right: 30px;
+		&::after {
+			transition: transform 0.2s;
+			content: url(../img/icons/arrow-bottom.svg);
+			position: absolute;
+			right: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		&.active {
+			&::after {
+				transform: translateY(-50%) rotateX(180deg);
+			}
+		}
+	}
+	&__list {
+		border: 1px solid #b0b2b7;
+		position: absolute;
+		background-color: #fff;
+		left: 0;
+		bottom: 0;
+		transform: translateY(100%);
+		width: 100%;
+		display: none;
+		& > .dropdown__btn {
+			&:hover {
+				background-color: rgba(gray, 0.3);
+			}
+		}
+		&.active {
+			display: block;
+		}
+	}
+
+	&__btn {
+		background-color: rgba(gray, 0.1);
+		padding: 5px;
+	}
+}
+
+// .md-menu {
+// 	position: absolute;
+// 	width: 100vw;
+// 	height: 100vh;
+// 	left: 0;
+// 	top: 0;
+// 	background-color: white;
+// 	z-index: 1000;
+// 	transform: translateX(-100%);
+// 	&.active {
+// 		transform: translateX(0);
+// 	}
+// 	&__close {
+// 		position: absolute;
+// 		right: 20px;
+// 		top: 20px;
+// 		width: 30px;
+// 		height: 30px;
+// 		background-color: transparent;
+// 		&::before,
+// 		&:after {
+// 			content: "";
+// 			position: absolute;
+// 			height: 3px;
+// 			display: block;
+// 			width: 100%;
+// 			top: 50%;
+// 			left: 0;
+// 			background-color: black;
+// 		}
+// 		&::before {
+// 			transform: translateY(-50%) rotate(-45deg);
+// 		}
+// 		&::after {
+// 			transform: translateY(-50%) rotate(45deg);
+// 		}
+// 	}
+// }
+
+.title {
+	font-weight: 600;
+	font-size: 20px;
+	color: $grayText;
+}
+.action-btn {
+	background-color: #9f9f9f;
+	padding: 16px 62px;
+	font-size: 18px;
+	font-weight: 600;
+	display: block;
+	text-align: center;
+	color: white;
+	border-radius: 20px;
+	img {
+		height: 1.3em;
+		margin-right: 8px;
+	}
+}
+.add-atribyte-btn {
+	@extend .input;
+	height: 56px;
+	width: 56px;
+	align-self: end;
+	background-color: transparent;
+}
+.accordion {
+	user-select: none;
+	&__btn {
+		font-weight: 600;
+		cursor: pointer;
+		font-size: 18px;
+		display: flex;
+		align-items: center;
+
+		&::after {
+			content: url(../img/icons/arrow-bottom.svg);
+			margin-left: 6px;
+		}
+	}
+
+	&__body {
+		height: 0;
+		overflow: hidden;
+		border: none;
+		margin-top: 16px;
+		margin-bottom: 13px;
+		animation: accordionBody 1s;
+	}
+	&.active {
+		.accordion__btn {
+			&::after {
+				transform: rotateX(180deg);
+			}
+		}
+		.accordion__body {
+			height: auto;
+		}
+	}
+}
+@keyframes accordionBody {
+	from {
+		height: 0px;
+	}
+	to {
+		height: auto;
+	}
+}
+@import "header";
+@import "login";
+@import "card";
+@import "documents";
+@import "list";
+@import "404";
+
+.events {
+	background-color: #fff;
+	height: 100%;
+	user-select: none;
+
+	&__content {
+		width: 100%;
+		height: 100%;
+		position: relative;
+		img {
+			pointer-events: none;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+	}
+	&__inner{
+
+	}
+}
+.generate-report{
+	background-color: #F7F9FC;
+}
+
+// +++++++++++++++++++++
+* {
+	transition: all 0.2s;
+}
+// +++++++++++++++++++++

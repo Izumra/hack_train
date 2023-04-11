@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<%- include('./parts/head', {title: 'Карточка' }) %>
+
+	<body>
+		<%- include('./parts/header', { breadcrumb: [ { name: 'Главная' , link: '/list' }, { name: 'Карточка объекта' } ]}) %>
+			<section class="card">
+				<div class="card__container container">
+					<div class="card__actions">
+						<div class="card__title title">Карточка объекта</div>
+						<div class="card__tabs card-tabs">
+							<button data-id="manually-tab" class="card-tabs__btn active action-btn">Добавить объект вручную</button>
+							<button data-id="api-tab" class="card-tabs__btn action-btn">API</button>
+							<button data-id="xml-tab" class="card-tabs__btn action-btn">XML</button>
+						</div>
+						<button id="delete-object" class="card__btn action-btn">Удалить объект</button>
+					</div>
+					<div id="manually-tab" class="card-tabs__content active card-manually">
+						<div class="card-manually__grid">
+							<div class="card-manually__body">
+								<div class="card-manually__object-name">Торговое помещение ТЦ “Кефтеме”</div>
+								<div class="card__chapter card-chapter">
+									<div class="card-chapter__title">Местоположение объекта</div>
+									<div class="card-chapter__items">
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Округ</div>
+											<div class="card-chapter__input"><input class="input" value="" type="text"></div>
+										</div>
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Район</div>
+											<div class="card-chapter__input"><input class="input" value="" type="text"></div>
+										</div>
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Адрес</div>
+											<div class="card-chapter__input"><input class="input" value=""
+													type="text"></div>
+										</div>
+									</div>
+								</div>
+								<div class="card__chapter card-chapter">
+									<div class="card-chapter__title">Характеристики</div>
+									<div class="card-chapter__items">
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Тип объекта</div>
+											<div class="card-chapter__dropdown dropdown">
+												<div data-value="" class="dropdown__select"></div>
+												<div class="dropdown__list">
+													<div data-value="1" class="dropdown__btn">Торговый центр</div>
+													<div data-value="2" class="dropdown__btn">Жилой дом</div>
+													<div data-value="3" class="dropdown__btn">Здание</div>
+													<div data-value="4" class="dropdown__btn">Помещение</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Состояние объекта</div>
+											<div class="card-chapter__dropdown dropdown">
+												<div data-value="" class="dropdown__select"></div>
+												<div class="dropdown__list">
+													<div data-value="1" class="dropdown__btn">Новый</div>
+													<div data-value="2" class="dropdown__btn">В работе</div>
+													<div data-value="3" class="dropdown__btn">Работы завершены</div>
+												</div>
+											</div>
+										</div>
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Площадь м<sup>2</sup></div>
+											<div class="card-chapter__input"><input class="input" value="" type="text"></div>
+										</div>
+									</div>
+								</div>
+								<div class="card__chapter card-chapter">
+									<div class="card-chapter__title">Прочее</div>
+									<div class="card-chapter__items">
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Собственник</div>
+											<div class="card-chapter__input"><input class="input" value="" type="text"></div>
+										</div>
+										<div class="card-chapter__item">
+											<div class="card-chapter__label">Фактический пользователь</div>
+											<div class="card-chapter__input"><input class="input" value="" type="text"></div>
+										</div>
+										<button class="add-atribyte-btn"><img src="img/icons/plus.svg" alt=""></button>
+									</div>
+								</div>
+							</div>
+							<div class="card-manually__documents">
+								<a href="/documents">Документы объекта</a>
+							</div>
+							<div class="card-manually__map">
+								<div class="card-manually__map-label">
+									<input placeholder="Координаты объекта" value="" type="text" class="input">
+								</div>
+								<iframe style="display: none;"
+									src="https://yandex.ru/map-widget/v1/?ll=37.931223%2C55.692456&mode=whatshere&whatshere%5Bpoint%5D=37.883294%2C55.699213&whatshere%5Bzoom%5D=17&z=17.26"
+									width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
+							</div>
+							<div class="card-manually__slider swiper">
+								<div class="swiper-wrapper">
+									<div class="swiper-slide">
+										<img src="assets/objects/object_1.jpg" alt="">
+									</div>
+								</div>
+								<div class="slider__prev-btn">&lt;</div>
+								<div class="slider__next-btn">&gt;</div>
+							</div>
+						</div>
+						<div id="api-tab" class="card-tabs__content">
+						</div>
+						<div id="xml-tab" class="card-tabs__content">
+						</div>
+					</div>
+			</section>
+			<%- include('./parts/popup') %>
+	</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<%- include('./parts/head', {title: 'Документы объекта' }) %>
+
+	<body>
+		<%- include('./parts/header', { breadcrumb: [ { name: 'Главная' , link: '/' }, { name: 'Карточка объекта' ,
+			link: '/card' }, {name: 'Документы объекта' } ]}) %>
+			<section class="documents">
+				<div class="documents__container container">
+					<div class="card__actions">
+						<div class="card__title title">Документы объекта</div>
+
+						<button id="create-folder" class="card__btn action-btn"><img src="img/icons/create-folder.svg" alt="">Создать папку</button>
+						<button id="upload" class="card__btn action-btn"><img src="img/icons/upload.svg" alt=""> Загрузить</button>
+						</button>
+					</div>
+					<div class="documents-table">
+						<div class="documents__row documents-table__header">
+							<div class="documents__col">Название</div>
+							<div class="documents__col">Тип</div>
+							<div class="documents__col">Дата <img src="img/icons/sort-arrow.svg" alt=""></div>
+							<div class="documents__col">Действие</div>
+						</div>
+						<div class="documents__row">
+							<div class="documents__col documents__file-name"><img src="img/icons/folder.svg" alt=""> Акт сдачи-приемки</div>
+							<div class="documents__col">Папка</div>
+							<div class="documents__col">7 апреля 2023</div>
+							<div class="documents__col">
+								<button class="documents__action"><img src="img/icons/download.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/share.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/delete-file.svg" alt=""></button>
+							</div>
+						</div>
+						<div class="documents__row">
+							<div class="documents__col documents__file-name"><img src="img/icons/folder.svg" alt=""> Документы для снятия с кад.уч.</div>
+							<div class="documents__col">Папка</div>
+							<div class="documents__col">23 марта 2023</div>
+							<div class="documents__col">
+								<button class="documents__action"><img src="img/icons/download.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/share.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/delete-file.svg" alt=""></button>
+							</div>
+						</div>
+						<div class="documents__row">
+							<div class="documents__col documents__file-name"><img src="img/icons/extPDF.svg" alt=""> Кадастровое свидетельство.pdf</div>
+							<div class="documents__col">Документ</div>
+							<div class="documents__col">8 марта 2023</div>
+							<div class="documents__col">
+								<button class="documents__action"><img src="img/icons/download.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/share.svg" alt=""></button>
+								<button class="documents__action"><img src="img/icons/delete-file.svg" alt=""></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<%- include('./parts/popup') %>
+	</body>
+
+</html>

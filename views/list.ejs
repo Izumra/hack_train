@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<%- include('./parts/head', {title: 'Реестр объектов' }) %>
+
+	<body>
+		<%- include('./parts/header', { breadcrumb: [ { name: 'Главная' } ]}) %>
+			<section class="list">
+				<div class="list__container container">
+					<div class="card__actions list__grid">
+						<div class="card__title title">Реестр объектов</div>
+						<a href="/catd" id="create-object" class="card__btn action-btn">Добавить объект</a>
+						<a href="/generate-report" id="generate-report" class="card__btn action-btn">Сформировать отчет</a>
+					</div>
+					<div class="list__grid">
+						<div class="list-filter">
+							<div class="list-filter__title">Фильтр</div>
+							<div class="list-filter__accordion accordion active">
+								<div class="accordion__btn">Округ</div>
+								<div class="accordion__body">
+									<div class="checkbox list-filter__checkbox">
+										<input id="district-1" type="checkbox">
+										<label for="district-1">Северный</label>
+									</div>
+									<div class="checkbox list-filter__checkbox ">
+										<input id="district-2" type="checkbox">
+										<label for="district-2">Восточный</label>
+									</div>
+									<div class="checkbox list-filter__checkbox ">
+										<input id="district-3" type="checkbox">
+										<label for="district-3">Южный</label>
+									</div>
+									<div class="checkbox list-filter__checkbox ">
+										<input id="district-4" type="checkbox">
+										<label for="district-4">Западный</label>
+									</div>
+									<div class="checkbox list-filter__checkbox ">
+										<input id="district-5" type="checkbox">
+										<label for="district-5">Северный</label>
+									</div>
+								</div>
+							</div>
+							<div class="list-filter__accordion accordion active">
+								<div class="accordion__btn">Район</div>
+								<div class="accordion__body">
+									<div class="checkbox list-filter__checkbox ">
+										<input id="region-1" type="checkbox">
+										<label for="region-1">Можайский</label>
+									</div>
+									<div class="checkbox list-filter__checkbox ">
+										<input id="region-2" type="checkbox">
+										<label for="region-2">Внуково</label>
+									</div>
+								</div>
+							</div>
+							<div class="list-filter__accordion accordion">
+								<div class="accordion__btn">Адрес</div>
+								<div class="accordion__body">
+								</div>
+							</div>
+							<div class="list-filter__accordion accordion">
+								<div class="accordion__btn">Тип объекта</div>
+								<div class="accordion__body">
+								</div>
+							</div>
+							<div class="list-filter__accordion accordion">
+								<div class="accordion__btn">Состояние объекта</div>
+								<div class="accordion__body">
+								</div>
+							</div>
+							<div class="list-filter__accordion accordion">
+								<div class="accordion__btn">Площадь</div>
+								<div class="accordion__body">
+								</div>
+							</div>
+						</div>
+						<div class="list-objects">
+							<div class="list-objects__header">
+								<button id="date-sort" class="list-objects__sort">Дата <img src="img/icons/sort-arrow.svg"
+										alt=""></button>
+								<div class="list-objects__search">
+									<img src="img/icons/loop.svg" alt="">
+									<input placeholder="Поиск объекта..." type="text" class="">
+								</div>
+							</div>
+							<div class="list-objects__list">
+								<% if(objects){%>
+									<% for(let i=0;i<objects.length;i++){ %>
+										<div class="list-objects-card">
+											<div class="list-objects-card__title"><%=objects[i].object_name%></div>
+											<div class="list-objects-card__wrapper">
+												<div class="list-objects-card__body">
+													<div class="list-objects-card__label">Статус</div>
+													<% if(objects[i].state_of_object=='новый'){ %>
+														<div class="list-objects-card__status new"><%=objects[i].state_of_object%></div>
+													<% }else if(objects[i].state_of_object=='в работе'){ %>
+														<div class="list-objects-card__status inWork"><%=objects[i].state_of_object%></div>
+													<% } else{ %>
+														<div class="list-objects-card__status completed"><%=objects[i].state_of_object%></div>
+													<% } %>
+													<div class="list-objects-card__label">Площадь</div>
+													<div class="list-objects-card__date"><%=objects[i].square%></div>
+												</div>
+												<% if(objects[i].image_link){ %>
+													<div class="list-objects-card__image"><img src="<%=objects[i].image_link%>" alt=""></div>
+												<% }else{ %>
+													<div class="list-objects-card__image"><img src="assets/objects/object_1.jpg" alt=""></div>
+												<% } %>
+											</div>
+											<div class="list-objects-card__actions">
+												<a href="/card?id=<%=objects[i].id_objects%>" class="list-objects-card__btn action-btn info">Подробнее</a>
+												<button class="list-objects-card__btn action-btn choise">Выбрать</button>
+												<button class="list-objects-card__btn action-btn cancel">Отмена</button>
+											</div>
+										</div>
+									<% } %>
+								<% } %>
+							</div>
+						</div>
+						<div class="list-dashboard">
+							<div class="list-events">
+								<div class="list-dashboard__title">Запланированные мероприятия по объекту</div>
+								<div class="calendar">
+									<div class="calendar__header">
+										<button class="calendar__prev-month calendar__nav-btn"><img src="img/icons/arrow-right.svg" alt=""></button>
+										<div class="calendar__title"></div>
+										<button class="calendar__next-month calendar__nav-btn"><img src="img/icons/arrow-right.svg" alt=""></button>
+									</div>
+									<div class="calendar__body">
+										<div class="calendar__cell calendar__week">Пн</div>
+										<div class="calendar__cell calendar__week">Вт</div>
+										<div class="calendar__cell calendar__week">Ср</div>
+										<div class="calendar__cell calendar__week">Чт</div>
+										<div class="calendar__cell calendar__week">Пт</div>
+										<div class="calendar__cell calendar__week">Сб</div>
+										<div class="calendar__cell calendar__week">Вс</div>
+										<div class="calendar__cell ">27</div>
+										<div class="calendar__cell ">28</div>
+										<div class="calendar__cell ">29</div>
+										<div class="calendar__cell ">30</div>
+										<div class="calendar__cell ">31</div>
+										<div class="calendar__cell cur">1</div>
+										<div class="calendar__cell cur">2</div>
+										<div class="calendar__cell cur">3</div>
+										<div class="calendar__cell cur">4</div>
+										<div class="calendar__cell cur">5</div>
+										<div class="calendar__cell cur">6</div>
+										<div class="calendar__cell cur">7</div>
+										<div class="calendar__cell cur">8</div>
+										<div class="calendar__cell cur">9</div>
+										<div class="calendar__cell cur">10</div>
+										<div class="calendar__cell cur">11</div>
+										<div class="calendar__cell cur">12</div>
+										<div class="calendar__cell cur">13</div>
+										<div class="calendar__cell cur">14</div>
+										<div class="calendar__cell cur">15</div>
+										<div class="calendar__cell cur">16</div>
+										<div class="calendar__cell cur">17</div>
+										<div class="calendar__cell cur">18</div>
+										<div class="calendar__cell cur">19</div>
+										<div class="calendar__cell cur">20</div>
+										<div class="calendar__cell cur">21</div>
+										<div class="calendar__cell cur">22</div>
+										<div class="calendar__cell cur">23</div>
+										<div class="calendar__cell cur">24</div>
+										<div class="calendar__cell cur">25</div>
+										<div class="calendar__cell cur">26</div>
+										<div class="calendar__cell cur">27</div>
+										<div class="calendar__cell cur">28</div>
+										<div class="calendar__cell cur">29</div>
+										<div class="calendar__cell cur">30</div>
+									</div>
+								</div>
+							</div>
+							<div class="list-work-groups">
+								<a href="/groups" class="list-dashboard__title">Рабочие группы <img src="img/icons/group.svg"
+										alt=""></a>
+								<div class="list-work-groups__row list-work-groups__header">
+									<div class="list-work-groups__col">Название</div>
+									<div class="list-work-groups__col">Дата начала – конца</div>
+									<div class="list-work-groups__col">Мероприятия</div>
+								</div>
+								<div class="list-work-groups__box">
+									<div class="list-work-groups__row">
+										<a href="/card" class="list-work-groups__col">Avengers</a>
+										<div class="list-work-groups__col">06.04.2023 - 16.04.2023</div>
+										<a href="/events" class="list-work-groups__col">Перейти</a>
+									</div>
+									<div class="list-work-groups__row">
+										<a href="/card" class="list-work-groups__col">new group</a>
+										<div class="list-work-groups__col">06.04.2023 - 16.04.2023</div>
+										<a href="/events" class="list-work-groups__col">Перейти</a>
+									</div>
+									<div class="list-work-groups__row">
+										<a href="/card" class="list-work-groups__col">workers</a>
+										<div class="list-work-groups__col">06.04.2023 - 16.04.2023</div>
+										<a href="/events" class="list-work-groups__col">Перейти</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<%- include('./parts/popup') %>
+	</body>
+
+</html>

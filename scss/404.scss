@@ -1,0 +1,38 @@
+.error-page {
+	height: 100%;
+	background: url(../img/404.jpg) right center/ auto 80% no-repeat;
+	background-color: #fff;
+
+	&__container {
+		display: flex;
+	}
+
+	&__body {
+		padding-top: 200px;
+		flex: 0 0 60%;
+	}
+
+	&__title {
+		font-size: 50px;
+		margin-bottom: 50px;
+	}
+
+	&__text {
+		font-size: 22px;
+		margin-bottom: 20px;
+		line-height: 1.1;
+	}
+
+	&__link {
+		color: #0000ff;
+		display: flex;
+		align-items: center;
+		font-size: 20px;
+		span{
+			font-size: 1.5em;
+			margin-right: 10px;
+			padding-bottom: .1em;
+		}
+	}
+
+}
