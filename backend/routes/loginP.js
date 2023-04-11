@@ -1,6 +1,7 @@
 import express from 'express'
 import {sendRequest} from '../middleware/dbQueryes.js'
 import {getLinkFile,getFile} from '../middleware/YOSfunctions.js'
+import { redisClient } from '../../server.js'
 
 const route = express.Router()
 
@@ -14,20 +15,15 @@ route.get('/', (req, res) => {
 })
 
 route.post('/', async (req, res) => {
-  const data = await sendRequest(`SELECT * FROM hack.users WHERE tel_number='${req.body.tel}'`)
-  if (data.length && data[0].pass == req.body.password) {
-	  req.session.user=JSON.stringify(data[0])
-	  const objectes = await sendRequest(`SELECT * FROM hack.objects`)
-	  for(let i=0;i<objectes.length;i++){
-      if(objectes.length>0&&objectes[i]&&objectes[i].image_link!=null){
-        objectes[i].image_link=await getLinkFile(objectes[i].image_link)
-      }
+  if(req.query.session){
+    let sess=await redisClient('sess:'+req.query.session)
+    if(sess!=null)sess=await JSON.parse(sess)
+    if(sess&&sess.user){
+      req.session.id=req.query.session
+      res.redirect('/list')
     }
-    req.session.objectes=JSON.stringify(objectes)
-    res.redirect('/list')
-  }
-  else {
     res.redirect('/')
   }
+  else res.status(400).json('Данные сессии не были переданы в параметры запроса')
 })
 export default route

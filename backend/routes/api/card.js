@@ -91,7 +91,13 @@ api.post('/delete',async(req,res)=>{
                             groups.push(datausers)
                         }
                     }
-                    await sendRequest('DELETE FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
+                    let data=await sendRequest('SELECT * FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
+                    if(data.length&&data.length>0){
+                        for(let i=0;i<data.length;i++){
+                            await deleteFile(data[i])
+                        }
+                        await sendRequest('DELETE FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
+                    }
                     if(groups.length&&groups.length>0){
                         for(let i=0;i<groups.length;i++){
                             await sendRequest('DELETE FROM hack.question WHERE id_user=$1',[groups[i].id_user])

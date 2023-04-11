@@ -65,28 +65,28 @@ switch (location.pathname) {
 }
 
 function login() {
-	// document.querySelector('.login__btn ').addEventListener('click', function(){
-	// 	location = '/list'
-	// })
-	// const raw = {
-	// 	tel: '+79818535382',
-	// 	password: 'vovako38' 
-	// }
+	document.querySelector('.login__btn ').addEventListener('click', function(){
+		location = '/list'
+	})
+	const raw = {
+		tel: '+79818535382',
+		password: 'vovako38' 
+	}
 
-	// fetch('https://app.izumra.ru/', {
-	// 	method: 'post',
-	// 	headers: {
-	// 		'Content-Type': 'application/json'
-	// 	},
-	// 	body: JSON.stringify(raw)
-	// })
-	// .then(async result => {
-	// 	if (result.ok){
-	// 		const data = await result.json()
-	// 		console.log(data);
-	// 	}
-	// })
-	// .catch(err => console.log(err))
+	fetch('https://app.izumra.ru/', {
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(raw)
+	})
+	.then(async result => {
+		if (result.ok){
+			const data = await result.json()
+			console.log(data);
+		}
+	})
+	.catch(err => console.log(err))
 }
 
 function list() {
