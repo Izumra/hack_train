@@ -12,7 +12,7 @@ api.post('/', express.json(), async (req, res) => {
       if(data[0].id_role==1){
         const objectes = await sendRequest(`SELECT * FROM hack.objects`)
         for(let i=0;i<objectes.length;i++){
-          if(objectes[i]&&objectes[i].image_link!=null)objectes[i].image_link=getLinkFile(objectes[i].image_link)
+          if(objectes[i]&&objectes[i].image_link!=null)objectes[i].image_link=await getLinkFile(objectes[i].image_link)
         }
         req.session.objectes=objectes
         res.status(200).json({user:data[0],objects:objectes,session:req.session.id})
@@ -30,7 +30,7 @@ api.post('/', express.json(), async (req, res) => {
         }
         if(objects.length>0){
             for(let i=0;i<objects.length;i++){
-                if(objects[i]&&objects[i].image_link!=null)objects[i].image_link=getLinkFile(objects[i].image_link)
+                if(objects[i]&&objects[i].image_link!=null)objects[i].image_link=await getLinkFile(objects[i].image_link)
             }
             res.status(200).json({user:data[0],objects:objects,session:req.session.id})
         }
