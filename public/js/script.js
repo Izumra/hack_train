@@ -65,10 +65,12 @@ switch (location.pathname) {
 }
 
 function login() {
+	let number=document.querySelector('.login__tell ').value
+	let password=document.querySelector('.login__pass ').value	
 	document.querySelector('.login__btn ').addEventListener('click', function(){
 		const raw = {
-			tel: '+79818535382',
-			password: 'vovako38' 
+			tel: number,
+			password: password 
 		}
 		fetch('https://app.izumra.ru/api/login', {
 			method: 'post',
