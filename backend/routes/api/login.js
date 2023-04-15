@@ -10,7 +10,7 @@ api.post('/', express.json(), async (req, res) => {
     if (data.length && data[0].pass == req.body.password) {
       req.session.user=data[0]
       if(data[0].id_role==1){
-        const objectes = await sendRequest(`SELECT * FROM hack.objects`)
+        let objectes = await sendRequest(`SELECT * FROM hack.objects`)
         for(let i=0;i<objectes.length;i++){
           if(objectes[i]&&objectes[i].image_link!=null)objectes[i].image_link=await getLinkFile(objectes[i].image_link)
         }
@@ -18,7 +18,7 @@ api.post('/', express.json(), async (req, res) => {
         res.status(200).json({user:data[0],objects:objectes,session:req.session.id})
       }
       else{
-        const objects=await sendRequest('SELECT * FROM hack.objects')
+        let objects=await sendRequest('SELECT * FROM hack.objects')
         for(let i=0;i<objects.length;i++){
             let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[objects[i].id_objects])
             if(groups){

@@ -16,18 +16,18 @@ api.post('/remove_doc',async (req,res)=>{
         console.log(user)
         if(user!=null){
             if(user.user&&user.user.id_role&&user.user.id_role==1){
-                const file=await sendRequest('SELECT * FROM hack.documents WHERE title=$1',[req.query.document])
+                let file=await sendRequest('SELECT * FROM hack.documents WHERE title=$1',[req.query.document])
                 if(file&&file.length&&file.length>0){
-                    const data=await deleteFile(req.query.document)
+                    let data=await deleteFile(req.query.document)
                     await sendRequest('DELETE FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[req.query.document,user.user.id_role])
                     res.status(200).json({mes:'Объект успешно удален',files:data})
                 }
                 else res.status(404).json('Файлы не найдены')
             }
             else{
-                const file=await sendRequest('SELECT * FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[req.query.document,user.user.id_role])
+                let file=await sendRequest('SELECT * FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[req.query.document,user.user.id_role])
                 if(file&&file.length&&file.length>0){
-                    const data=await deleteFile(req.query.document)
+                    let data=await deleteFile(req.query.document)
                     await sendRequest('DELETE FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[req.query.document,user.user.id_role])
                     res.status(200).json({mes:'Объект успешно удален',files:data})
                 }
@@ -41,13 +41,13 @@ api.post('/remove_doc',async (req,res)=>{
         if(user!=null)user=await JSON.parse(user)
         console.log(user)
         if(user!=null){
-            const objects=req.query.document.split(', ')
-            const fileses=[]
+            let objects=req.query.document.split(', ')
+            let fileses=[]
             if(user.user.id_role==1){
                 for(let i=0;i<objects.length;i++){
-                    const files=await sendRequest('SELECT * FROM hack.documents WHERE title=$1',[objects[i]])
+                    let files=await sendRequest('SELECT * FROM hack.documents WHERE title=$1',[objects[i]])
                     if(files&&files.length>0){
-                        const data=await deleteFile(objects[i])
+                        let data=await deleteFile(objects[i])
                         await sendRequest('DELETE FROM hack.documents WHERE title=$1',[objects[i]])
                         fileses.push(data)
                     }
@@ -57,9 +57,9 @@ api.post('/remove_doc',async (req,res)=>{
             }
             else if(user.user.id_role){
                 for(let i=0;i<objects.length;i++){
-                    const files=await sendRequest('SELECT * FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[objects[i],user.user.id_role])
+                    let files=await sendRequest('SELECT * FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[objects[i],user.user.id_role])
                     if(files&&files.length>0){
-                        const data=await deleteFile(objects[i])
+                        let data=await deleteFile(objects[i])
                         await sendRequest('DELETE FROM hack.documents WHERE title=$1 AND id_user_owner=$2',[objects[i],user.user.id_role])
                         fileses.push(data)
                     }
@@ -79,13 +79,13 @@ api.post('/delete',async(req,res)=>{
         let session= await redisClient.get('sess:'+req.query.session)
         if(session!=null)session=await JSON.parse(session)
         if(session!=null&&session.user&&session.user.id_role==1){
-            const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
+            let data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
             if(data.length&&data.length>0){
-                const datagroups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[0].id_objects])
+                let datagroups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[0].id_objects])
                 if(datagroups.length&&datagroups.length>0){
                     let groups=[]
                     for(let i=0;i<datagroups.length;i++){
-                        const datausers=await sendRequest('SELECT * FROM hack.users WHERE id_conference=$1',[datagroups[i].id_conference])
+                        let datausers=await sendRequest('SELECT * FROM hack.users WHERE id_conference=$1',[datagroups[i].id_conference])
                         if(datausers.length&&datausers.length>0){
                             await sendRequest('UPDATE hack.users SET id_conference=$1 WHERE id_conference=$2',[1,datagroups[i].id_conference])
                             groups.push(datausers)
@@ -128,7 +128,7 @@ api.post('/',async(req,res)=>{
     if(client)client=JSON.parse(client)
 
     if(req.query.object_name&&req.query.session&&client){
-        const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
+        let data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
         if(client.user.id_role!=1){
             let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[0].id_objects])
             if(groups){
@@ -142,7 +142,7 @@ api.post('/',async(req,res)=>{
             }
         }
         if(data&&data.length>0){
-            const docs=await sendRequest('SELECT * FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
+            let docs=await sendRequest('SELECT * FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
             if(docs){
                 for(let i=0;i<docs.length;i++){
                     docs[i].title=getLinkFile(data[i].title)
@@ -154,7 +154,7 @@ api.post('/',async(req,res)=>{
         else res.status(404).send('Объект не был найден на сервере или у вас нет прав на взаимодействие с эти объектом')
     }
     else if(req.query.session&&client){
-        const data=await sendRequest('SELECT * FROM hack.objects')
+        let data=await sendRequest('SELECT * FROM hack.objects')
         if(client.user.id_role!=1){
             for(let i=0;i<data.length;i++){
                 let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[i].id_objects])
@@ -183,11 +183,11 @@ api.post('/change',upload.fields([{name:'avatar',maxCount:1},{name:'documents'}]
         if(user)user=await JSON.parse(user) 
         if(user&&user.user.id_role==1){
             if(req.query.req_object){
-                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.req_object])
+                let data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.req_object])
                 if(data&&data.length>0){
                     if(req.files['avatar']?.length>0||req.files['documents']?.length>0){
                         if(req.files['avatar']?.length>0){
-                            const avatar=req.files['avatar'][0].originalname
+                            let avatar=req.files['avatar'][0].originalname
                             await sendFile(req.files['avatar'][0])
                             await sendRequest('UPDATE hack.objects SET image_link=$1 WHERE id_objects=$2',[req.files['avatar'][0].filename+path.extname(req.files['avatar'][0].originalname),data[0].id_objects])
                         }
@@ -202,9 +202,9 @@ api.post('/change',upload.fields([{name:'avatar',maxCount:1},{name:'documents'}]
                     }
                     await sendRequest(`UPDATE hack.objects SET ${params.slice(0,params.length-2)} WHERE object_name=$1`,[req.query.req_object])
                     if(req.body.sup_params){
-                        const req_params=JSON.parse(req.body?.sup_params)
+                        let req_params=JSON.parse(req.body?.sup_params)
                         for(let i=0;i<req.params?.length;i++){
-                            const param=await sendRequest('SELECT * FROM hack.sup_params WHERE title=$1 AND id_objects=$2',[req_params[i].title,data[0].id_objects])
+                            let param=await sendRequest('SELECT * FROM hack.sup_params WHERE title=$1 AND id_objects=$2',[req_params[i].title,data[0].id_objects])
                             if(param){
                                 await sendRequest(`UPDATE hack.sup_params SET ${param[0].value+'='+req_params[i].value} WHERE title=$1 AND object_name=$2`,[req_params[i].title,data[0].id_objects])
                             }
@@ -227,10 +227,10 @@ api.post('/addObject',upload.fields([{name:'avatar',maxCount:1},{name:'documents
         if(user)user=await JSON.parse(user) 
         if(user&&user.user.id_role==1){
             if(req.body&&req.body.object_name&&req.body.district&&req.body.region&&req.body.address&&req.body.type_of_object&&req.body.state_of_object&&req.body.square&&req.body.owner_of_object&&req.body.fact_user&&req.files['avatar']&&req.files['documents']&&req.files['avatar'].length!=0&&req.files['documents'].length!=0&&req.body.sup_params&&req.body.cords){
-                const avatar=req.files.avatar[0].originalname
+                let avatar=req.files.avatar[0].originalname
                 await sendFile(req.files['avatar'][0])
                 await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
-                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
+                let data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
                 let params=JSON.parse(req.body.sup_params)
                 for(let i=0;i<Object.values(params);i++){
                     await sendRequest('INSERT INTO hack.sup_params(title,value,id_objects)values($1,$2,$3)',[params[i].title,params[i].value,data[0].id_objects])
@@ -245,10 +245,10 @@ api.post('/addObject',upload.fields([{name:'avatar',maxCount:1},{name:'documents
                 res.status(400).send('Не все обязательные параметры были переданы')
             }
             else if(!req.body.sup_params){
-                const avatar=req.files.avatar[0].originalname
+                let avatar=req.files.avatar[0].originalname
                 await sendFile(req.files['avatar'][0])
                 await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
-                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
+                let data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
                 for(let i=0;i<req.files.documents.length;i++){
                     await sendFile(req.files['documents'][i])
                     await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
