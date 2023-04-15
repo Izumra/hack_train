@@ -123,10 +123,25 @@ api.post('/delete',async(req,res)=>{
     else res.status(400).json('Не было передано название удаляемого объекта недвижимости или сессия пользователя')
 })
 
-api.get('/',async(req,res)=>{
-    if(req.query.object_name){
+api.post('/',async(req,res)=>{
+    let client=await redisClient.get('sess:'+req.query.session)
+    if(client)client=JSON.parse(client)
+
+    if(req.query.object_name&&req.query.session&&client){
         const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
-        if(data.length>0&&data[0]){
+        if(client.user.id_role!=1){
+            let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[0].id_objects])
+            if(groups){
+                for(let i=0;i<groups.length;i++){
+                    if(client.user.id_conference==groups[i].id_conference){
+                        data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
+                        break
+                    }
+                    else data=null
+                }
+            }
+        }
+        if(data&&data.length>0){
             const docs=await sendRequest('SELECT * FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
             if(docs){
                 for(let i=0;i<docs.length;i++){
@@ -136,88 +151,117 @@ api.get('/',async(req,res)=>{
             }
             res.json({object:data[0],documents:docs})
         }
-        else res.status(404).send('Объект не был найден на сервере')
+        else res.status(404).send('Объект не был найден на сервере или у вас нет прав на взаимодействие с эти объектом')
     }
-    else{
+    else if(req.query.session&&client){
         const data=await sendRequest('SELECT * FROM hack.objects')
+        if(client.user.id_role!=1){
+            for(let i=0;i<data.length;i++){
+                let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[i].id_objects])
+                if(groups){
+                    for(let j=0;j<groups.length;j++){
+                        if(client.user.id_conference==groups[j].id_conference)break
+                        else data[i]=null
+                    }
+                }
+            }
+        }
         if(data.length>0){
             for(let i=0;i<data.length;i++){
-                if(data[i].image_link!=null)data[i].image_link=getLinkFile(data[i].image_link)
+                if(data[i]&&data[i].image_link!=null)data[i].image_link=getLinkFile(data[i].image_link)
             }
             res.json(data)
         }
-        else res.status(404).send('На сервере нет ни одного объекта')
+        else res.status(404).send('На сервере нет ни одного объекта или у вас нет прав доступа к этому объекту')
     }
+    else res.status(400).json('Не было передано идентификатора сессии или идентификатор недействительный')
 })
 
 api.post('/change',upload.fields([{name:'avatar',maxCount:1},{name:'documents'}]),express.json(),async(req,res)=>{
-    if(req.query.req_object){
-        const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.req_object])
-        if(data&&data.length>0){
-            if(req.files['avatar']?.length>0||req.files['documents']?.length>0){
-                if(req.files['avatar']?.length>0){
-                    const avatar=req.files['avatar'][0].originalname
-                    await sendFile(req.files['avatar'][0])
-                    await sendRequest('UPDATE hack.objects SET image_link=$1 WHERE id_objects=$2',[req.files['avatar'][0].filename+path.extname(req.files['avatar'][0].originalname),data[0].id_objects])
+    if(req.query.session){
+        let user=await redisClient.get('sess:'+req.query.session)
+        if(user)user=await JSON.parse(user) 
+        if(user&&user.user.id_role==1){
+            if(req.query.req_object){
+                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.req_object])
+                if(data&&data.length>0){
+                    if(req.files['avatar']?.length>0||req.files['documents']?.length>0){
+                        if(req.files['avatar']?.length>0){
+                            const avatar=req.files['avatar'][0].originalname
+                            await sendFile(req.files['avatar'][0])
+                            await sendRequest('UPDATE hack.objects SET image_link=$1 WHERE id_objects=$2',[req.files['avatar'][0].filename+path.extname(req.files['avatar'][0].originalname),data[0].id_objects])
+                        }
+                        for(let i=0;i<req.files.documents.length;i++){
+                            await sendFile(req.files['documents'][i])
+                            await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
+                        }
+                    }
+                    let params=''
+                    for(let i=0;i<Object.values(req.body).length;i++){
+                        if(Object.keys(req.body)[i]!='sup_params')params+=Object.keys(req.body)[i]+'='+'\''+Object.values(req.body)[i]+'\''+', '
+                    }
+                    await sendRequest(`UPDATE hack.objects SET ${params.slice(0,params.length-2)} WHERE object_name=$1`,[req.query.req_object])
+                    if(req.body.sup_params){
+                        const req_params=JSON.parse(req.body?.sup_params)
+                        for(let i=0;i<req.params?.length;i++){
+                            const param=await sendRequest('SELECT * FROM hack.sup_params WHERE title=$1 AND id_objects=$2',[req_params[i].title,data[0].id_objects])
+                            if(param){
+                                await sendRequest(`UPDATE hack.sup_params SET ${param[0].value+'='+req_params[i].value} WHERE title=$1 AND object_name=$2`,[req_params[i].title,data[0].id_objects])
+                            }
+                            else await sendRequest(`INSERT into hack.sup_params(title,value,id_objects) values($1,$2,$3)`,[req_params[i].title,req_params[i].value,data[0].id_objects])
+                        }
+                    }
+                    res.status(201).send('Дополнительные параметры были успешно добавлены')
+                }
+                else res.status(400).send('Данного объекта нет в базе данных')
+            }
+            else res.status(404).send('Ошибка: НЕ было передано название объекта для изменений')
+        }
+    }
+    else res.status(400).json('Не было передано идентификатора сессии')
+})
+
+api.post('/addObject',upload.fields([{name:'avatar',maxCount:1},{name:'documents'}]),express.json(),async(req,res)=>{
+    if(req.query.session){
+        let user=await redisClient.get('sess:'+req.query.session)
+        if(user)user=await JSON.parse(user) 
+        if(user&&user.user.id_role==1){
+            if(req.body&&req.body.object_name&&req.body.district&&req.body.region&&req.body.address&&req.body.type_of_object&&req.body.state_of_object&&req.body.square&&req.body.owner_of_object&&req.body.fact_user&&req.files['avatar']&&req.files['documents']&&req.files['avatar'].length!=0&&req.files['documents'].length!=0&&req.body.sup_params&&req.body.cords){
+                const avatar=req.files.avatar[0].originalname
+                await sendFile(req.files['avatar'][0])
+                await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
+                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
+                let params=JSON.parse(req.body.sup_params)
+                for(let i=0;i<Object.values(params);i++){
+                    await sendRequest('INSERT INTO hack.sup_params(title,value,id_objects)values($1,$2,$3)',[params[i].title,params[i].value,data[0].id_objects])
                 }
                 for(let i=0;i<req.files.documents.length;i++){
                     await sendFile(req.files['documents'][i])
                     await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
                 }
+                res.status(201).send('Объект успешно добавлен')
             }
-            let params=''
-            for(let i=0;i<Object.values(req.body).length;i++){
-                if(Object.keys(req.body)[i]!='sup_params')params+=Object.keys(req.body)[i]+'='+'\''+Object.values(req.body)[i]+'\''+', '
+            else if(!req.body.object_name||!req.body.district||!req.body.region||!req.body.address||!req.body.type_of_object||!req.body.state_of_object||!req.body.square||!req.body.owner_of_object||!req.body.fact_user||!req.files['avatar']||!req.files['documents']||req.files['avatar']?.length==0||req.files['documents']?.length==0||!req.body.cords){
+                res.status(400).send('Не все обязательные параметры были переданы')
             }
-            await sendRequest(`UPDATE hack.objects SET ${params.slice(0,params.length-2)} WHERE object_name=$1`,[req.query.req_object])
-            if(req.body.sup_params){
-                const req_params=JSON.parse(req.body?.sup_params)
-                for(let i=0;i<req.params?.length;i++){
-                    const param=await sendRequest('SELECT * FROM hack.sup_params WHERE title=$1 AND id_objects=$2',[req_params[i].title,data[0].id_objects])
-                    if(param){
-                        await sendRequest(`UPDATE hack.sup_params SET ${param[0].value+'='+req_params[i].value} WHERE title=$1 AND object_name=$2`,[req_params[i].title,data[0].id_objects])
-                    }
-                    else await sendRequest(`INSERT into hack.sup_params(title,value,id_objects) values($1,$2,$3)`,[req_params[i].title,req_params[i].value,data[0].id_objects])
+            else if(!req.body.sup_params){
+                const avatar=req.files.avatar[0].originalname
+                await sendFile(req.files['avatar'][0])
+                await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
+                const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
+                for(let i=0;i<req.files.documents.length;i++){
+                    await sendFile(req.files['documents'][i])
+                    await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
                 }
+                res.status(201).send('Объект успешно добален')
             }
-            res.status(201).send('Дополнительные параметры были успешно добавлены')
+            else res.status(400).send('Данные не были переданы в запрос')
         }
-        else res.status(400).send('Данного объекта нет в базе данных')
+        else if(user&&user.user.id_role!=1)res.status(400).json('У данного пользователя нет прав на добавление объектов') 
+        else res.status(400).json('Сессия не была найдена') 
     }
-    else res.status(404).send('Ошибка: НЕ было передано название объекта для изменений')
-})
-
-api.post('/',upload.fields([{name:'avatar',maxCount:1},{name:'documents'}]),express.json(),async(req,res)=>{
-    if(req.body&&req.body.object_name&&req.body.district&&req.body.region&&req.body.address&&req.body.type_of_object&&req.body.state_of_object&&req.body.square&&req.body.owner_of_object&&req.body.fact_user&&req.files['avatar']&&req.files['documents']&&req.files['avatar'].length!=0&&req.files['documents'].length!=0&&req.body.sup_params&&req.body.cords){
-        const avatar=req.files.avatar[0].originalname
-        await sendFile(req.files['avatar'][0])
-        await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
-        const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
-        let params=JSON.parse(req.body.sup_params)
-        for(let i=0;i<Object.values(params);i++){
-            await sendRequest('INSERT INTO hack.sup_params(title,value,id_objects)values($1,$2,$3)',[params[i].title,params[i].value,data[0].id_objects])
-        }
-        for(let i=0;i<req.files.documents.length;i++){
-            await sendFile(req.files['documents'][i])
-            await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
-        }
-        res.status(201).send('Объект успешно добавлен')
-    }
-    else if(!req.body.object_name||!req.body.district||!req.body.region||!req.body.address||!req.body.type_of_object||!req.body.state_of_object||!req.body.square||!req.body.owner_of_object||!req.body.fact_user||!req.files['avatar']||!req.files['documents']||req.files['avatar']?.length==0||req.files['documents']?.length==0||!req.body.cords){
-        res.status(400).send('Не все обязательные параметры были переданы')
-    }
-    else if(!req.body.sup_params){
-        const avatar=req.files.avatar[0].originalname
-        await sendFile(req.files['avatar'][0])
-        await sendRequest('INSERT INTO hack.objects(object_name,district,region,address,type_of_object,state_of_object,square,owner_of_object,fact_user,image_link,cords)values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[req.body.object_name,req.body.district,req.body.region,req.body.address,req.body.type_of_object,req.body.state_of_object,req.body.square,req.body.owner_of_object,req.body.fact_user,avatar,req.body.cords])
-        const data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.body.object_name])
-        for(let i=0;i<req.files.documents.length;i++){
-            await sendFile(req.files['documents'][i])
-            await sendRequest('INSERT INTO hack.documents(title,id_objects)values($1,$2)',[req.files['documents'][i].filename+path.extname(req.files['documents'][i].originalname),data[0].id_objects])
-        }
-        res.status(201).send('Объект успешно добален')
-    }
-    else res.status(400).send('Данные не были переданы в запрос')
+    else if(user&&user.user.id_role!=1)res.status(400).json('У данного пользователя нет прав на добавление объектов') 
+    else res.status(400).json('Не было передано данных сессии пользователя')   
 })
 
 export default api

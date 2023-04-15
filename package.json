@@ -6,9 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "gulp",
-    "nodemon": "start /MIN nodemon server.dev.js",
-    "start": "node server.dev.js",
-    "build":"node server.js"
+    "nodemon": "start /MIN nodemon server.js",
+    "start": "node server.js"
   },
   "author": "Vladimir Kondaurov",
   "license": "ISC",
