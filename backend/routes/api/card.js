@@ -135,7 +135,7 @@ api.post('/',async(req,res)=>{
                 for(let i=0;i<groups.length;i++){
                     if(client.user.id_conference==groups[i].id_conference){
                         data=await sendRequest('SELECT * FROM hack.objects WHERE object_name=$1',[req.query.object_name])
-                        break
+                        continue
                     }
                     else data=null
                 }
@@ -160,7 +160,7 @@ api.post('/',async(req,res)=>{
                 let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[i].id_objects])
                 if(groups){
                     for(let j=0;j<groups.length;j++){
-                        if(client.user.id_conference==groups[j].id_conference)break
+                        if(client.user.id_conference==groups[j].id_conference)continue
                         else data[i]=null
                     }
                 }

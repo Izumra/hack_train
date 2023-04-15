@@ -3,7 +3,7 @@ import { redisClient } from '../../server.js'
 
 const route = express.Router()
 route.get('/', (req, res) => {
-  if(req.session&&!req.session.user&&!req.session.objectes){
+  if(req.session&&!req.session.user&&!req.session.objects){
 	  res.render('login')
   }
   else{
@@ -34,6 +34,7 @@ route.post('/',express.json(), async (req, res) => {
   if(req.body&&req.body.user&&req.body.objects){
     req.session.user=req.body.user
     req.session.objects=req.body.objects
+    res.status(200).json('Сессия сохранена')
   }
   else res.status(400).json('Тело запроса не полное или не было передано')
 })

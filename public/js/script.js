@@ -66,27 +66,36 @@ switch (location.pathname) {
 
 function login() {
 	document.querySelector('.login__btn ').addEventListener('click', function(){
-		location = '/list'
-	})
-	const raw = {
-		tel: '+79818535382',
-		password: 'vovako38' 
-	}
-
-	fetch('https://app.izumra.ru/', {
-		method: 'post',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(raw)
-	})
-	.then(async result => {
-		if (result.ok){
-			const data = await result.json()
-			console.log(data);
+		const raw = {
+			tel: '+79818535382',
+			password: 'vovako38' 
 		}
+		fetch('https://app.izumra.ru/api/login', {
+			method: 'post',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(raw)
+		})
+		.then(async result => {
+			if (result.ok){
+				const data = await result.json()
+				await fetch('http://localhost:3000/',{
+					method:'post',
+					headers:{
+						'Content-Type':'application/json'
+					},
+					body:JSON.stringify(data)
+				})
+				.then((res)=>{
+					location='/list'
+				})
+				.catch(err=>location='/')
+				console.log(data);
+			}
+		})
+		.catch(err => console.log(err))
 	})
-	.catch(err => console.log(err))
 }
 
 function list() {
@@ -113,10 +122,10 @@ function list() {
 
 	//datasort 
 	const dateSortBtn = document.querySelector('#date-sort')
-	dateSortBtn.addEventListener('click', function () {
-		dateSortBtn.classList.toggle('active')
-		document.querySelector('.list-objects__list').classList.toggle('sorted')
-	})
+	// dateSortBtn.addEventListener('click', function () {
+	// 	dateSortBtn.classList.toggle('active')
+	// 	document.querySelector('.list-objects__list').classList.toggle('sorted')
+	// })
 
 	//calendar
 	const date = new Date()
