@@ -23,7 +23,7 @@ api.post('/', express.json(), async (req, res) => {
             let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[objects[i].id_objects])
             if(groups){
                 for(let j=0;j<groups.length;j++){
-                    if(objects[i].id_conference==groups[j].id_conference)continue
+                    if(groups[i].id_conference==groups[j].id_conference)continue
                     else objects[i]=null
                 }
             }
