@@ -83,6 +83,7 @@ function login() {
 		.then(async result => {
 			if (result.ok){
 				const data = await result.json()
+				console.log(data)
 				await fetch('http://localhost:3000/',{
 					method:'post',
 					headers:{
@@ -91,10 +92,9 @@ function login() {
 					body:JSON.stringify(data)
 				})
 				.then((res)=>{
-					location='/list'
+					//location='/list'
 				})
 				.catch(err=>location='/')
-				console.log(data);
 			}
 		})
 		.catch(err => console.log(err))

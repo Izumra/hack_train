@@ -83,35 +83,37 @@
 								</div>
 							</div>
 							<div class="list-objects__list">
-								<% if(objects){%>
+								<% if(objects&&objects.length>0){%>
 									<% for(let i=0;i<objects.length;i++){ %>
-										<div class="list-objects-card">
-											<div class="list-objects-card__title"><%=objects[i].object_name%></div>
-											<div class="list-objects-card__wrapper">
-												<div class="list-objects-card__body">
-													<div class="list-objects-card__label">Статус</div>
-													<% if(objects[i].state_of_object=='новый'){ %>
-														<div class="list-objects-card__status new"><%=objects[i].state_of_object%></div>
-													<% }else if(objects[i].state_of_object=='в работе'){ %>
-														<div class="list-objects-card__status inWork"><%=objects[i].state_of_object%></div>
-													<% } else{ %>
-														<div class="list-objects-card__status completed"><%=objects[i].state_of_object%></div>
+										<% if(objects[i]){ %>
+											<div class="list-objects-card">
+												<div class="list-objects-card__title"><%=objects[i].object_name%></div>
+												<div class="list-objects-card__wrapper">
+													<div class="list-objects-card__body">
+														<div class="list-objects-card__label">Статус</div>
+														<% if(objects[i].state_of_object=='новый'){ %>
+															<div class="list-objects-card__status new"><%=objects[i].state_of_object%></div>
+														<% }else if(objects[i].state_of_object=='в работе'){ %>
+															<div class="list-objects-card__status inWork"><%=objects[i].state_of_object%></div>
+														<% } else{ %>
+															<div class="list-objects-card__status completed"><%=objects[i].state_of_object%></div>
+														<% } %>
+														<div class="list-objects-card__label">Площадь</div>
+														<div class="list-objects-card__date"><%=objects[i].square%></div>
+													</div>
+													<% if(objects[i].image_link){ %>
+														<div class="list-objects-card__image"><img src="<%=objects[i].image_link%>" alt=""></div>
+													<% }else{ %>
+														<div class="list-objects-card__image"><img src="assets/objects/object_1.jpg" alt=""></div>
 													<% } %>
-													<div class="list-objects-card__label">Площадь</div>
-													<div class="list-objects-card__date"><%=objects[i].square%></div>
 												</div>
-												<% if(objects[i].image_link){ %>
-													<div class="list-objects-card__image"><img src="<%=objects[i].image_link%>" alt=""></div>
-												<% }else{ %>
-													<div class="list-objects-card__image"><img src="assets/objects/object_1.jpg" alt=""></div>
-												<% } %>
+												<div class="list-objects-card__actions">
+													<a href="/card?id=<%=i%>" class="list-objects-card__btn action-btn info">Подробнее</a>
+													<button class="list-objects-card__btn action-btn choise">Выбрать</button>
+													<button class="list-objects-card__btn action-btn cancel">Отмена</button>
+												</div>
 											</div>
-											<div class="list-objects-card__actions">
-												<a href="/card?id=<%=objects[i].id_objects%>" class="list-objects-card__btn action-btn info">Подробнее</a>
-												<button class="list-objects-card__btn action-btn choise">Выбрать</button>
-												<button class="list-objects-card__btn action-btn cancel">Отмена</button>
-											</div>
-										</div>
+										<% } %>
 									<% } %>
 								<% } %>
 							</div>

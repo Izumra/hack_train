@@ -15,6 +15,7 @@ api.post('/', express.json(), async (req, res) => {
           if(objectes[i]&&objectes[i].image_link!=null)objectes[i].image_link=await getLinkFile(objectes[i].image_link)
         }
         req.session.objectes=objectes
+        req.session.sess=req.body.session
         res.status(200).json({user:data[0],objects:objectes,session:req.session.id})
       }
       else{
@@ -32,6 +33,8 @@ api.post('/', express.json(), async (req, res) => {
             for(let i=0;i<objects.length;i++){
                 if(objects[i]&&objects[i].image_link!=null)objects[i].image_link=await getLinkFile(objects[i].image_link)
             }
+            req.session.objectes=objects
+            req.session.sess=req.body.session
             res.status(200).json({user:data[0],objects:objects,session:req.session.id})
         }
         else res.status(404).send('На сервере нет ни одного объекта или у вас нет прав доступа к этому объекту')
