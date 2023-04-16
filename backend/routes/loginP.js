@@ -34,6 +34,7 @@ route.post('/',express.json(), async (req, res) => {
   if(req.body&&req.body.user&&req.body.objects){
     req.session.user=req.body.user
     req.session.objects=req.body.objects
+    req.session.sess=req.body.session
     res.status(200).json('Сессия сохранена')
   }
   else res.status(400).json('Тело запроса не полное или не было передано')

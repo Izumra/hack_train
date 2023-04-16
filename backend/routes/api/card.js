@@ -145,35 +145,35 @@ api.post('/',async(req,res)=>{
             let docs=await sendRequest('SELECT * FROM hack.documents WHERE id_objects=$1',[data[0].id_objects])
             if(docs){
                 for(let i=0;i<docs.length;i++){
-                    docs[i].title=getLinkFile(data[i].title)
+                    docs[i].title=await getLinkFile(data[i].title)
                 }
-                if(data[0].image_link!=null)data[0].image_link=getLinkFile(data[0].image_link)
+                if(data[0].image_link!=null)data[0].image_link=await getLinkFile(data[0].image_link)
             }
             res.json({object:data[0],documents:docs})
         }
         else res.status(404).send('Объект не был найден на сервере или у вас нет прав на взаимодействие с эти объектом')
     }
-    else if(req.query.session&&client){
-        let data=await sendRequest('SELECT * FROM hack.objects')
-        if(client.user.id_role!=1){
-            for(let i=0;i<data.length;i++){
-                let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[i].id_objects])
-                if(groups){
-                    for(let j=0;j<groups.length;j++){
-                        if(client.user.id_conference==groups[j].id_conference)continue
-                        else data[i]=null
-                    }
-                }
-            }
-        }
-        if(data.length>0){
-            for(let i=0;i<data.length;i++){
-                if(data[i]&&data[i].image_link!=null)data[i].image_link=getLinkFile(data[i].image_link)
-            }
-            res.json(data)
-        }
-        else res.status(404).send('На сервере нет ни одного объекта или у вас нет прав доступа к этому объекту')
-    }
+    // else if(req.query.session&&client){
+    //     let data=await sendRequest('SELECT * FROM hack.objects')
+    //     if(client.user.id_role!=1){
+    //         for(let i=0;i<data.length;i++){
+    //             let groups=await sendRequest('SELECT * FROM hack.job_group WHERE id_objects=$1',[data[i].id_objects])
+    //             if(groups){
+    //                 for(let j=0;j<groups.length;j++){
+    //                     if(client.user.id_conference==groups[j].id_conference)continue
+    //                     else data[i]=null
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if(data.length>0){
+    //         for(let i=0;i<data.length;i++){
+    //             if(data[i]&&data[i].image_link!=null)data[i].image_link=await getLinkFile(data[i].image_link)
+    //         }
+    //         res.json(data)
+    //     }
+    //     else res.status(404).send('На сервере нет ни одного объекта или у вас нет прав доступа к этому объекту')
+    // }
     else res.status(400).json('Не было передано идентификатора сессии или идентификатор недействительный')
 })
 

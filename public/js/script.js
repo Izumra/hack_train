@@ -92,7 +92,7 @@ function login() {
 					body:JSON.stringify(data)
 				})
 				.then((res)=>{
-					//location='/list'
+					location='/list'
 				})
 				.catch(err=>location='/')
 			}
